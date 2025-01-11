@@ -12,6 +12,18 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
+// Simulates generating a unique short URL id
+const generateRandomString = function () {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  // Generate a random 6-character string
+  for (let i = 0; i < 6; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+
 // Home route
 app.get("/", (req, res) => {
   res.send("Hello!");
