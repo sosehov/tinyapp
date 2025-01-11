@@ -38,6 +38,12 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 })
 
+// Submit the form
+app.post("/urls", (req, res) => {
+  console.log(req.body);
+  res.send("OK");
+});
+
 // Show specific URL by ID
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
