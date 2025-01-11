@@ -52,8 +52,10 @@ app.get("/urls/new", (req, res) => {
 
 // Submit the form
 app.post("/urls", (req, res) => {
-  console.log(req.body);
-  res.send("OK");
+  const longURL = req.body.longURL; // get the long URL from the form data
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = longURL; // Save the new shortURL -> longURL pair in the database
+  res.redirect(`/urls/${shortURL}`); // Redirect to the newly created URL page
 });
 
 // Show specific URL by ID
