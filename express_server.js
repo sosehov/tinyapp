@@ -4,6 +4,7 @@ const app = express();
 const PORT = 8080; // default port 8080
 
 app.use(morgan('dev')); // Middleware- Enable server side logging
+app.use(express.urlencoded({extended: true }));
 app.set("view engine", "ejs"); // Set view engine
 
 const urlDatabase = {
@@ -31,6 +32,11 @@ app.get("/urls", (req, res) => {
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
+
+// Present the form to the user
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+})
 
 // Show specific URL by ID
 app.get("/urls/:id", (req, res) => {
