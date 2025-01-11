@@ -13,7 +13,7 @@ const urlDatabase = {
 };
 
 // Simulates generating a unique short URL id
-const generateRandomString = function () {
+const generateRandomString = function() {
   let result = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const charactersLength = characters.length;
@@ -22,7 +22,7 @@ const generateRandomString = function () {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
-}
+};
 
 // Home route
 app.get("/", (req, res) => {
@@ -48,7 +48,7 @@ app.get("/hello", (req, res) => {
 // Present the form to the user
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
-})
+});
 
 // Submit the form
 app.post("/urls", (req, res) => {
