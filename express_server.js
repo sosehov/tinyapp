@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const app = express();
 const PORT = 8080; // default port 8080
-const dbFile = path.join(_dirname, 'urls.json');
+const dbFile = path.join(__dirname, 'urls.json');
 
 app.use(morgan('dev')); // Middleware- Enable server side logging
 app.use(express.urlencoded({extended: true }));
@@ -14,13 +14,21 @@ app.set("view engine", "ejs"); // Set view engine
 let urlDatabase = {};
 
 // Read URL data from the file on server startup
-fs.readFile(dbFile, (err, data) => {
-  if (err) {
-    console.log("Could not read database file:", err);
-  } else {
-    urlDatabase = JSON.parse(data);
-  }
-});
+const loadDatabase = function() {
+  fs.readFile(dbFile, 'utf8', (err, data) => {
+    if (err) {
+      // If the file doesn't exist or can't be read, initialize with an empty object
+      if (err.code === 'ENOENT') {
+        console.log("Database file not found, initializing a new one.");
+      } else {
+        console.log("Error reading database file:", err);
+      }
+      urlDatabase = {}; // Initialize an empty database if reading fails
+    } else {
+      urlDatabase = JSON.parse(data); // Parse the JSON data from the file
+    }
+  });
+};
 
 // Save URL data to the file whenever it's updated
 const saveDatabase = () => {
@@ -87,7 +95,7 @@ app.get("/urls/:id", (req, res) => {
 
   if (!longURL) {
     return res.status(404).send('Short URL not found!'); // Return 404 if short URL doesn't exist
-  };
+  }
 
   const templateVars = { id: shortURL, longURL };
   res.render("urls_show", templateVars);
@@ -99,7 +107,7 @@ app.get("/u/:id", (req, res) => {
 
   if (!longURL) {
     return res.status(404).send('Short URL not found!'); // Return 4404 if short URL doesn't exist
-  };
+  }
 
   // Redirect the user to the long URL (using a permanent redirect)
   res.redirect(301, longURL); // Use 301 for permanent redirection
@@ -109,3 +117,6 @@ app.get("/u/:id", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+// Load the database when the server starts up
+loadDatabase();
