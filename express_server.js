@@ -10,9 +10,10 @@ app.use(morgan('dev')); // Middleware- Enable server side logging
 app.use(express.urlencoded({extended: true }));
 app.set("view engine", "ejs"); // Set view engine
 
+// Initialize URL database
 let urlDatabase = {};
 
-// Load URL data from the file on server startup
+// Read URL data from the file on server startup
 fs.readFile(dbFile, (err, data) => {
   if (err) {
     console.log("Could not read database file:", err);
@@ -30,12 +31,11 @@ const saveDatabase = () => {
   });
 };
 
-// Simulates generating a unique short URL id
+// Generate a random 6-character string for a short URL ID
 const generateRandomString = function() {
   let result = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const charactersLength = characters.length;
-  // Generate a random 6-character string
   for (let i = 0; i < 6; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
@@ -47,57 +47,65 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-// Route for returning URL database in JSON format
+// Route to return the URL database in JSON format
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-// Route to render all URLs
+// Route to render a page displaying all URLs
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
-// Simple hello world route
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
-// Present the form to the user
+// Route to render the form for creating a new URL
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-// Submit the form
+// Route to handle form submission and create a new short URL
 app.post("/urls", (req, res) => {
   const longURL = req.body.longURL; // get the long URL from the form data
+
+  // Generate a new unique short URL ID
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = longURL; // Save the new shortURL -> longURL pair in the database
-  saveDatabase(); //Save data to file after each update
-  res.redirect(`/urls/${shortURL}`); // Redirect to the newly created URL page
+
+  // Save the new short URL and corresponding long URL in the database
+  urlDatabase[shortURL] = longURL;
+
+  // Save the updated database to the file
+  saveDatabase();
+
+  // Redirect to the newly created URL's page
+  res.redirect(`/urls/${shortURL}`);
 });
 
-// Show specific URL by ID
+// Route to display the specific short URL and its corresponding long URL
 app.get("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   const longURL = urlDatabase[shortURL];
+
   if (!longURL) {
-    return res.status(404).send('Short URL not found!');
+    return res.status(404).send('Short URL not found!'); // Return 404 if short URL doesn't exist
   };
+
   const templateVars = { id: shortURL, longURL };
   res.render("urls_show", templateVars);
 });
 
-//Redirect any request to "/u/id" to its longURL
+// Route to handle redirection to the long URL based on the short URL ID
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
+
   if (!longURL) {
-    return res.status(404).send('Short URL not found!');
+    return res.status(404).send('Short URL not found!'); // Return 4404 if short URL doesn't exist
   };
+
+  // Redirect the user to the long URL (using a permanent redirect)
   res.redirect(301, longURL); // Use 301 for permanent redirection
 });
 
-// Start the server
+// Start the server and listen for incoming requests
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
