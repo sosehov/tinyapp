@@ -10,11 +10,6 @@ app.use(morgan('dev')); // Middleware- Enable server side logging
 app.use(express.urlencoded({extended: true }));
 app.set("view engine", "ejs"); // Set view engine
 
-/* const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
-}; */
-
 let urlDatabase = {};
 
 // Load URL data from the file on server startup
