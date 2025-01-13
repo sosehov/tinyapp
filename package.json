@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/sosehov/tinyapp#readme",
   "dependencies": {
+    "cookie-parser": "^1.4.7",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
     "morgan": "^1.10.0"
