@@ -113,6 +113,39 @@ app.get("/u/:id", (req, res) => {
   res.redirect(301, longURL); // Use 301 for permanent redirection
 });
 
+// Route to render the form for updating a URL
+app.get("/urls/:id/edit", (req, res) => {
+  const shortURL = req.params.id;
+  const longURL = urlDatabase[shortURL];
+
+  if (!longURL) {
+    return res.status(404).send('Short URL not found!');
+  }
+
+  const templateVars = { id: shortURL, longURL };
+  res.render("urls_edit", templateVars);
+});
+
+// Route to handle form submission and update a URL
+app.post("/urls/:id", (req, res) => {
+  const shortURL = req.params.id;
+  const newLongURL = req.body.longURL;
+
+  // Check if the short URL exists
+  if(!urlDatabase[shortURL]) {
+    return res.status(404).send('Short URL not found!');
+  }
+
+  // Update the long URL in the database
+  urlDatabase[shortURL] = newLongURL;
+
+  // Save the updated database to the file
+  saveDatabase();
+
+  // Redirect to the newly created URL's page
+  res.redirect(`/urls/${shortURL}`);
+});
+
 // Route to handle deleting a URL resource
 app.post("/urls/:id/delete", (req, res) => {
   const shortURL = req.params.id;
@@ -130,7 +163,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
   // Redirect to the newly created URL's page
   res.redirect("/urls");
-})
+});
 
 // Start the server and listen for incoming requests
 app.listen(PORT, () => {
