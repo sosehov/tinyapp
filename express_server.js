@@ -2,6 +2,7 @@ const express = require("express");
 const morgan = require('morgan');
 const fs = require('fs');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080; // default port 8080
 const dbFile = path.join(__dirname, 'urls.json');
@@ -9,6 +10,7 @@ const dbFile = path.join(__dirname, 'urls.json');
 app.use(morgan('dev')); // Middleware- Enable server side logging
 app.use(express.urlencoded({extended: true }));
 app.set("view engine", "ejs"); // Set view engine
+app.use(cookieParser());
 
 // Initialize URL database
 let urlDatabase = {};
@@ -62,7 +64,10 @@ app.get("/urls.json", (req, res) => {
 
 // Route to render a page displaying all URLs
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { 
+    urls: urlDatabase,
+    username: req.cookies.username //Ensure the username is passed to the template
+   };
   res.render("urls_index", templateVars);
 });
 
@@ -163,6 +168,22 @@ app.post("/urls/:id/delete", (req, res) => {
 
   // Redirect to the newly created URL's page
   res.redirect("/urls");
+});
+
+// Route to handle login
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+
+  if (username) {
+    // Set the 'username' cookie
+    res.cookie('username', username);
+
+  // Redirect back to the /urls page
+    res.redirect("/urls");
+  } else {
+    // If no username is provided, display an error
+    res.status(400).send('Username is required!');
+  }
 });
 
 // Start the server and listen for incoming requests
