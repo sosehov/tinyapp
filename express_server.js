@@ -123,7 +123,7 @@ app.get("/urls/:id/edit", (req, res) => {
   }
 
   const templateVars = { id: shortURL, longURL };
-  res.render("urls_edit", templateVars);
+  res.render("urls_show", templateVars);
 });
 
 // Route to handle form submission and update a URL
