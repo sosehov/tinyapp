@@ -113,6 +113,25 @@ app.get("/u/:id", (req, res) => {
   res.redirect(301, longURL); // Use 301 for permanent redirection
 });
 
+// Route to handle deleting a URL resource
+app.post("/urls/:id/delete", (req, res) => {
+  const shortURL = req.params.id;
+
+  // Check if the short URL exists
+  if(!urlDatabase[shortURL]) {
+    return res.status(404).send('Short URL not found!');
+  }
+
+  // Delete the short URL from the database
+  delete urlDatabase[shortURL];
+
+  // Save the updated database to the file
+  saveDatabase();
+
+  // Redirect to the newly created URL's page
+  res.redirect("/urls");
+})
+
 // Start the server and listen for incoming requests
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
