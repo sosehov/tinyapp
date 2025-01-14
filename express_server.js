@@ -4,16 +4,21 @@ const fs = require('fs');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = 8080;
 const dbFile = path.join(__dirname, 'urls.json');
 
-app.use(morgan('dev')); // Middleware- Enable server side logging
+app.use(morgan('dev'));
 app.use(express.urlencoded({extended: true }));
-app.set("view engine", "ejs"); // Set view engine
+app.set("view engine", "ejs");
 app.use(cookieParser());
 
 // Initialize URL database
 let urlDatabase = {};
+
+// Helper function to get the username from cookies
+const getUsernameFromCookies = function(req) {
+  return req.cookies["username"] || null;
+}
 
 // Read URL data from the file on server startup
 const loadDatabase = function() {
@@ -66,30 +71,28 @@ app.get("/urls.json", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = { 
     urls: urlDatabase,
-    username: req.cookies.username //Ensure the username is passed to the template
+    username: getUsernameFromCookies(req) //Ensure the username is passed to the template
    };
   res.render("urls_index", templateVars);
 });
 
 // Route to render the form for creating a new URL
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = { 
+    username: getUsernameFromCookies(req) //Ensure the username is passed to the template
+   };
+  res.render("urls_new", templateVars);
 });
 
 // Route to handle form submission and create a new short URL
 app.post("/urls", (req, res) => {
-  const longURL = req.body.longURL; // get the long URL from the form data
-
-  // Generate a new unique short URL ID
+  const longURL = req.body.longURL;
   const shortURL = generateRandomString();
 
   // Save the new short URL and corresponding long URL in the database
   urlDatabase[shortURL] = longURL;
-
-  // Save the updated database to the file
   saveDatabase();
 
-  // Redirect to the newly created URL's page
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -99,10 +102,14 @@ app.get("/urls/:id", (req, res) => {
   const longURL = urlDatabase[shortURL];
 
   if (!longURL) {
-    return res.status(404).send('Short URL not found!'); // Return 404 if short URL doesn't exist
+    return res.status(404).send('Short URL not found!');
   }
 
-  const templateVars = { id: shortURL, longURL };
+  const templateVars = {
+    id: shortURL, 
+    longURL,
+    username: getUsernameFromCookies(req)
+  };
   res.render("urls_show", templateVars);
 });
 
@@ -127,7 +134,11 @@ app.get("/urls/:id/edit", (req, res) => {
     return res.status(404).send('Short URL not found!');
   }
 
-  const templateVars = { id: shortURL, longURL };
+  const templateVars = {
+    id: shortURL,
+    longURL,
+    username: getUsernameFromCookies(req)
+  };
   res.render("urls_show", templateVars);
 });
 
@@ -136,18 +147,13 @@ app.post("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   const newLongURL = req.body.longURL;
 
-  // Check if the short URL exists
   if(!urlDatabase[shortURL]) {
     return res.status(404).send('Short URL not found!');
   }
 
   // Update the long URL in the database
   urlDatabase[shortURL] = newLongURL;
-
-  // Save the updated database to the file
   saveDatabase();
-
-  // Redirect to the newly created URL's page
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -155,18 +161,11 @@ app.post("/urls/:id", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   const shortURL = req.params.id;
 
-  // Check if the short URL exists
   if(!urlDatabase[shortURL]) {
     return res.status(404).send('Short URL not found!');
   }
-
-  // Delete the short URL from the database
   delete urlDatabase[shortURL];
-
-  // Save the updated database to the file
   saveDatabase();
-
-  // Redirect to the newly created URL's page
   res.redirect("/urls");
 });
 
@@ -178,12 +177,16 @@ app.post("/login", (req, res) => {
     // Set the 'username' cookie
     res.cookie('username', username);
 
-  // Redirect back to the /urls page
     res.redirect("/urls");
   } else {
-    // If no username is provided, display an error
     res.status(400).send('Username is required!');
   }
+});
+
+// Route to handle logout
+app.post("/logout", (req, res) => {
+  res.clearCookie('username');
+  res.redirect("/urls");
 });
 
 // Start the server and listen for incoming requests
