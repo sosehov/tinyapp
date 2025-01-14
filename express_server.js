@@ -14,11 +14,11 @@ app.use(cookieParser());
 
 // Initialize URL database
 let urlDatabase = {};
-let userDatabasae = {};
+const users = {};
 
-// Helper function to get the username from cookies
-const getUsernameFromCookies = function(req) {
-  return req.cookies["username"] || null;
+// Helper function to get the user object
+const getUserByID = function(userID) {
+  return users[userID] || null;
 };
 
 // Read URL data from the file on server startup
@@ -72,7 +72,7 @@ app.get("/urls.json", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: getUsernameFromCookies(req) //Ensure the username is passed to the template
+    user: res.locals.user
   };
   res.render("urls_index", templateVars);
 });
@@ -80,7 +80,7 @@ app.get("/urls", (req, res) => {
 // Route to render the form for creating a new URL
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    username: getUsernameFromCookies(req) //Ensure the username is passed to the template
+    user: res.locals.user
   };
   res.render("urls_new", templateVars);
 });
@@ -109,7 +109,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: shortURL,
     longURL,
-    username: getUsernameFromCookies(req)
+    user: res.locals.user,
   };
   res.render("urls_show", templateVars);
 });
@@ -138,7 +138,7 @@ app.get("/urls/:id/edit", (req, res) => {
   const templateVars = {
     id: shortURL,
     longURL,
-    username: getUsernameFromCookies(req)
+    user: res.locals.user,
   };
   res.render("urls_show", templateVars);
 });
@@ -172,12 +172,11 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // Route to handle login
 app.post("/login", (req, res) => {
-  const username = req.body.username;
+  const { username } = req.body;
 
   if (username) {
-    // Set the 'username' cookie
-    res.cookie('username', username);
-
+    // Set the 'user_id' cookie
+    res.cookie('user_id', username);
     res.redirect("/urls");
   } else {
     res.status(400).send('Username is required!');
@@ -186,7 +185,7 @@ app.post("/login", (req, res) => {
 
 // Route to handle logout
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect("/urls");
 });
 
@@ -195,10 +194,17 @@ app.get("/register", (req, res) => {
   res.render("register");
 });
 
-// Route to handle form submission
+// Route to handle registration form submission
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
-  // save to db
+  const userID = generateRandomString();
+  userRandomID = 'user' + generateRandomString();
+  users[userID] = {
+    id: userID,
+    email: email,
+    password: password,
+  };
+  res.cookie('user_id', userID);
   res.redirect("/urls");
 })
 
