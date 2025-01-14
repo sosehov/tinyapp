@@ -14,6 +14,7 @@ app.use(cookieParser());
 
 // Initialize URL database
 let urlDatabase = {};
+let userDatabasae = {};
 
 // Helper function to get the username from cookies
 const getUsernameFromCookies = function(req) {
@@ -188,6 +189,18 @@ app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect("/urls");
 });
+
+// Route to render the registration form 
+app.get("/register", (req, res) => {
+  res.render("register");
+});
+
+// Route to handle form submission
+app.post("/register", (req, res) => {
+  const { email, password } = req.body;
+  // save to db
+  res.redirect("/urls");
+})
 
 // Start the server and listen for incoming requests
 app.listen(PORT, () => {
