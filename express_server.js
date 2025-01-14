@@ -18,7 +18,7 @@ let urlDatabase = {};
 // Helper function to get the username from cookies
 const getUsernameFromCookies = function(req) {
   return req.cookies["username"] || null;
-}
+};
 
 // Read URL data from the file on server startup
 const loadDatabase = function() {
@@ -69,18 +69,18 @@ app.get("/urls.json", (req, res) => {
 
 // Route to render a page displaying all URLs
 app.get("/urls", (req, res) => {
-  const templateVars = { 
+  const templateVars = {
     urls: urlDatabase,
     username: getUsernameFromCookies(req) //Ensure the username is passed to the template
-   };
+  };
   res.render("urls_index", templateVars);
 });
 
 // Route to render the form for creating a new URL
 app.get("/urls/new", (req, res) => {
-  const templateVars = { 
+  const templateVars = {
     username: getUsernameFromCookies(req) //Ensure the username is passed to the template
-   };
+  };
   res.render("urls_new", templateVars);
 });
 
@@ -106,7 +106,7 @@ app.get("/urls/:id", (req, res) => {
   }
 
   const templateVars = {
-    id: shortURL, 
+    id: shortURL,
     longURL,
     username: getUsernameFromCookies(req)
   };
@@ -147,7 +147,7 @@ app.post("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   const newLongURL = req.body.longURL;
 
-  if(!urlDatabase[shortURL]) {
+  if (!urlDatabase[shortURL]) {
     return res.status(404).send('Short URL not found!');
   }
 
@@ -161,7 +161,7 @@ app.post("/urls/:id", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   const shortURL = req.params.id;
 
-  if(!urlDatabase[shortURL]) {
+  if (!urlDatabase[shortURL]) {
     return res.status(404).send('Short URL not found!');
   }
   delete urlDatabase[shortURL];
