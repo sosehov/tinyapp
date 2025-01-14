@@ -184,7 +184,7 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
-// Route to render the registration form 
+// Route to render the registration form
 app.get("/register", (req, res) => {
   res.render("register");
 });
@@ -193,7 +193,6 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
   const userID = generateRandomString();
-  userRandomID = 'user' + generateRandomString();
   users[userID] = {
     id: userID,
     email: email,
@@ -201,7 +200,7 @@ app.post("/register", (req, res) => {
   };
   res.cookie('user_id', userID);
   res.redirect("/urls");
-})
+});
 
 // Start the server and listen for incoming requests
 app.listen(PORT, () => {
