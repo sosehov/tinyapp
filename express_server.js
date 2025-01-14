@@ -175,6 +175,11 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls");
 });
 
+// Route to GET the login form
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
 // Route to handle login
 app.post("/login", (req, res) => {
   const { username } = req.body;
@@ -202,7 +207,7 @@ app.get("/register", (req, res) => {
 // Route to handle registration form submission
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
-  
+
   if (!email || !password) {
     return res.status(400).send('Email and password are required');
   }
