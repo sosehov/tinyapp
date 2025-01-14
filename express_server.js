@@ -16,6 +16,16 @@ app.use(cookieParser());
 let urlDatabase = {};
 const users = {};
 
+// Helper function to lookup user in users object
+const findUserByEmail = function(email) {
+  for (const userID in users) {
+    if (users[userID].email === email) {
+      return users[userID];
+    }
+  }
+  return null;
+};
+
 // Read URL data from the file on server startup
 const loadDatabase = function() {
   fs.readFile(dbFile, 'utf8', (err, data) => {
@@ -192,6 +202,16 @@ app.get("/register", (req, res) => {
 // Route to handle registration form submission
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
+  
+  if (!email || !password) {
+    return res.status(400).send('Email and password are required');
+  }
+
+  const existingUser = findUserByEmail(email);
+  if (existingUser) {
+    return res.status(400).send('Email is already registered!');
+  }
+
   const userID = generateRandomString();
   users[userID] = {
     id: userID,
