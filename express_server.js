@@ -16,11 +16,6 @@ app.use(cookieParser());
 let urlDatabase = {};
 const users = {};
 
-// Helper function to get the user object
-const getUserByID = function(userID) {
-  return users[userID] || null;
-};
-
 // Read URL data from the file on server startup
 const loadDatabase = function() {
   fs.readFile(dbFile, 'utf8', (err, data) => {
