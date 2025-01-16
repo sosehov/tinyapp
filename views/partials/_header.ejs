@@ -21,7 +21,7 @@
       <div class="navbar-nav ml-auto">
         <% if (user) { %>
           <!-- If the user is logged in, show their email and a logout button -->
-          <span class="navbar-text" style="color: black;">Logged in as: <%= user.email %>!</span>
+          <span class="navbar-text" style="color: black; margin-right: 10px;">Logged in as: <%= user.email %>!</span>
           <form action="/logout" method="POST" style="display: inline;">
             <button type="submit" class="btn btn-outline-dark">Logout</button>
           </form>
