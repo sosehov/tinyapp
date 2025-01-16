@@ -200,10 +200,10 @@ app.post("/login", (req, res) => {
   const existingUser = findUserByEmail(email);
 
   if (!existingUser) {
-    res.status(403).send('Invalid user');
+    return res.status(403).send('Invalid user');
   }
   if (password != existingUser.password) {
-    res.status(403).send('incorrect password');
+    return res.status(403).send('incorrect password');
   }
   res.cookie('user_id', existingUser.id);
   res.redirect("/urls");
