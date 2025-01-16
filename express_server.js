@@ -14,13 +14,14 @@ app.use(cookieParser());
 
 // Initialize URL database
 let urlDatabase = {};
+// Initialize the users database
 const users = {};
 
 // Helper function to lookup user in users object
 const findUserByEmail = function(email) {
-  for (const userID in users) {
-    if (users[userID].email === email) {
-      return users[userID];
+  for (const userid in users) {
+    if (users[userid].email === email) {
+      return users[userid];
     }
   }
   return null;
@@ -75,17 +76,21 @@ app.get("/urls.json", (req, res) => {
 
 // Route to render a page displaying all URLs
 app.get("/urls", (req, res) => {
+  const userId = req.cookies['user_id'];
+  const user = users[userId];
   const templateVars = {
     urls: urlDatabase,
-    user: res.locals.user
+    user: user
   };
   res.render("urls_index", templateVars);
 });
 
 // Route to render the form for creating a new URL
 app.get("/urls/new", (req, res) => {
+  const userId = req.cookies['user_id'];
+  const user = users[userId];
   const templateVars = {
-    user: res.locals.user
+    user: user
   };
   res.render("urls_new", templateVars);
 });
@@ -106,6 +111,8 @@ app.post("/urls", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   const longURL = urlDatabase[shortURL];
+  const userId = req.cookies['user_id'];
+  const user = users[userId];
 
   if (!longURL) {
     return res.status(404).send('Short URL not found!');
@@ -114,7 +121,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: shortURL,
     longURL,
-    user: res.locals.user,
+    user: user,
   };
   res.render("urls_show", templateVars);
 });
@@ -135,6 +142,8 @@ app.get("/u/:id", (req, res) => {
 app.get("/urls/:id/edit", (req, res) => {
   const shortURL = req.params.id;
   const longURL = urlDatabase[shortURL];
+  const userId = req.cookies['user_id'];
+  const user = users[userId];
 
   if (!longURL) {
     return res.status(404).send('Short URL not found!');
@@ -143,7 +152,7 @@ app.get("/urls/:id/edit", (req, res) => {
   const templateVars = {
     id: shortURL,
     longURL,
-    user: res.locals.user,
+    user: user,
   };
   res.render("urls_show", templateVars);
 });
@@ -177,31 +186,43 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // Route to GET the login form
 app.get("/login", (req, res) => {
-  res.render("login");
+  const userId = req.cookies['user_id'];
+  const user = users[userId];
+  const templateVars = {
+    user: user
+  };
+  res.render("login", templateVars);
 });
 
 // Route to handle login
 app.post("/login", (req, res) => {
-  const { username } = req.body;
+  const { email, password } = req.body;
+  const existingUser = findUserByEmail(email);
 
-  if (username) {
-    // Set the 'user_id' cookie
-    res.cookie('user_id', username);
-    res.redirect("/urls");
-  } else {
-    res.status(400).send('Username is required!');
+  if (!existingUser) {
+    res.status(403).send('Invalid user');
   }
+  if (password != existingUser.password) {
+    res.status(403).send('incorrect password');
+  }
+    res.cookie('user_id', existingUser.userid);
+    res.redirect("/urls");
 });
 
 // Route to handle logout
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 // Route to render the registration form
 app.get("/register", (req, res) => {
-  res.render("register");
+  const userId = req.cookies['user_id'];
+  const user = users[userId];
+  const templateVars = {
+    user: user
+  };
+  res.render("register", templateVars);
 });
 
 // Route to handle registration form submission
@@ -217,13 +238,13 @@ app.post("/register", (req, res) => {
     return res.status(400).send('Email is already registered!');
   }
 
-  const userID = generateRandomString();
-  users[userID] = {
-    id: userID,
+  const userid = generateRandomString();
+  users[userid] = {
+    id: userid,
     email: email,
     password: password,
   };
-  res.cookie('user_id', userID);
+  res.cookie('user_id', userid);
   res.redirect("/urls");
 });
 
