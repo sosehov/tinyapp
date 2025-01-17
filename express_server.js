@@ -113,10 +113,22 @@ app.get("/urls/:id", (req, res) => {
   const userId = req.cookies['user_id'];
   const user = users[userId];
 
+  // If user is not logged in return error message
+  if (!user) {
+    return res.status(401).send('Please log in to view the URL details.');
+  }
+
+  // If the URL does not exist return error message
   if (!urlData) {
     return res.status(404).send('Short URL not found!');
   }
 
+  // If the logged in user does not own the URL return error message
+  if (urlData.userID !== userId) {
+    return res.status(403).send('You do not have permission to view this URL.');
+  }
+
+  // If all checks pass, render the page
   const templateVars = {
     id: shortURL,
     longURL: urlData.longURL,
