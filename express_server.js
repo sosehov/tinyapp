@@ -26,7 +26,6 @@ const generateRandomString = function() {
   return result;
 };
 
-
 // Helper function to lookup user in users object
 const findUserByEmail = function(email) {
   for (const userid in users) {
@@ -164,7 +163,7 @@ app.post("/login", (req, res) => {
   if (!existingUser) {
     return res.status(403).send('Invalid user');
   }
-  if (password != existingUser.password) {
+  if (password !== existingUser.password) {
     return res.status(403).send('incorrect password');
   }
   res.cookie('user_id', existingUser.id);
