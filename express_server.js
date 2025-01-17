@@ -45,6 +45,12 @@ app.get("/urls.json", (req, res) => {
 app.get("/urls", (req, res) => {
   const userId = req.cookies['user_id'];
   const user = users[userId];
+
+  // If user is not logged in, return error message
+  if (!user) {
+    return res.status(401).send("Please log in to view your urls")
+  }
+
   const templateVars = {
     urls: urlDatabase,
     user: user
@@ -112,24 +118,7 @@ app.get("/u/:id", (req, res) => {
   const urlData = urlDatabase[req.params.id];
 
   if (!urlData) {
-    return res.status(404).send(`
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
-        <title>URL Not Found</title>
-      </head>
-      <body>
-        <main style="margin: 1em;">
-          <h3>404 - URL Not Found</h3>
-          <p>The shortened URL you are trying to access does not exist.</p>
-          <a href="/urls" class="btn btn-primary">Back to URLs List</a>
-        </main>
-      </body>
-      </html>
-    `);
+    return res.status(404).send("404 - URL Not Found: The shortened URL you are trying to access does not exist.");
   }
   
   // Redirect the user to the long URL - using a permanent redirect
@@ -181,7 +170,7 @@ app.post("/urls/:id/delete", (req, res) => {
   if (!urlDatabase[shortURL]) {
     return res.status(404).send('Short URL not found!');
   }
-  
+
   delete urlDatabase[shortURL];
   res.redirect("/urls");
 });
