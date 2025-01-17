@@ -56,6 +56,12 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const userId = req.cookies['user_id'];
   const user = users[userId];
+
+  // If user is not logged in redirect to login page
+  if (!user) {
+    return res.redirect("/login");
+  }
+
   const templateVars = {
     user: user
   };
@@ -64,6 +70,13 @@ app.get("/urls/new", (req, res) => {
 
 // Route to handle form submission and create a new short URL
 app.post("/urls", (req, res) => {
+  const userId = req.cookies['user_id'];
+  const user = users[userId];
+
+  if (!user) {
+    return res.send("Please log in to create a new short URL");
+  }
+
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = longURL;
