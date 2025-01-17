@@ -63,8 +63,10 @@ app.get("/urls", (req, res) => {
     return res.status(401).send("Please log in to view your urls")
   }
 
+  const userUrls = urlsForUser(userId);
+
   const templateVars = {
-    urls: urlDatabase,
+    urls: userUrls,
     user: user
   };
   res.render("urls_index", templateVars);
