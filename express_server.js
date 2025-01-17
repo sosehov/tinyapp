@@ -160,6 +160,14 @@ app.get("/urls/:id/edit", (req, res) => {
     return res.status(404).send('Short URL not found!');
   }
 
+  if (!user) {
+    return res.status(401).send('Please log in to edit the URL.');
+  }
+
+  if (urlData.userID !== userId) {
+    return res.status(403).send('You do not have permission to view this URL.');
+  }
+
   const templateVars = {
     id: shortURL,
     longURL: urlData.longURL,
@@ -173,9 +181,18 @@ app.post("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   const newLongURL = req.body.longURL;
   const userId = req.cookies['user_id'];
+  const urlData = urlDatabase[shortURL];
 
-  if (!urlDatabase[shortURL]) {
+  if (!urlData) {
     return res.status(404).send('Short URL not found!');
+  }
+
+  if (!userId) {
+    return res.status(401).send('Please log in to edit the URL');
+  }
+
+  if (urlData.userID !== userId) {
+    return res.status(403).send('You do not have permission to edit this URL');
   }
 
   // Update the long URL in the database
@@ -190,9 +207,19 @@ app.post("/urls/:id", (req, res) => {
 // Route to handle deleting a URL resource
 app.post("/urls/:id/delete", (req, res) => {
   const shortURL = req.params.id;
+  const userId = req.cookies['user_id'];
+  const urlData = urlDatabase[shortURL];
 
-  if (!urlDatabase[shortURL]) {
+  if (!urlData) {
     return res.status(404).send('Short URL not found!');
+  }
+
+  if (!userId) {
+    return res.status(401).send('Please log in to dleete the URL');
+  }
+
+  if (urlData.userID !== userId) {
+    return res.status(403).send('You do not have permission to delete this URL');
   }
 
   delete urlDatabase[shortURL];
