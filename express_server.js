@@ -1,11 +1,8 @@
 const express = require("express");
 const morgan = require('morgan');
-const fs = require('fs');
-const path = require('path');
 const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080;
-const dbFile = path.join(__dirname, 'urls.json');
 
 app.use(morgan('dev'));
 app.use(express.urlencoded({extended: true }));
@@ -14,44 +11,9 @@ app.use(cookieParser());
 
 // Initialize URL database
 let urlDatabase = {};
+
 // Initialize the users database
 const users = {};
-
-// Helper function to lookup user in users object
-const findUserByEmail = function(email) {
-  for (const userid in users) {
-    if (users[userid].email === email) {
-      return users[userid];
-    }
-  }
-  return null;
-};
-
-// Read URL data from the file on server startup
-const loadDatabase = function() {
-  fs.readFile(dbFile, 'utf8', (err, data) => {
-    if (err) {
-      // If the file doesn't exist or can't be read, initialize with an empty object
-      if (err.code === 'ENOENT') {
-        console.log("Database file not found, initializing a new one.");
-      } else {
-        console.log("Error reading database file:", err);
-      }
-      urlDatabase = {}; // Initialize an empty database if reading fails
-    } else {
-      urlDatabase = JSON.parse(data); // Parse the JSON data from the file
-    }
-  });
-};
-
-// Save URL data to the file whenever it's updated
-const saveDatabase = () => {
-  fs.writeFile(dbFile, JSON.stringify(urlDatabase, null, 2), (err) => {
-    if (err) {
-      console.log("Error saving database:", err);
-    }
-  });
-};
 
 // Generate a random 6-character string for a short URL ID
 const generateRandomString = function() {
@@ -64,10 +26,16 @@ const generateRandomString = function() {
   return result;
 };
 
-// Home route
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
+
+// Helper function to lookup user in users object
+const findUserByEmail = function(email) {
+  for (const userid in users) {
+    if (users[userid].email === email) {
+      return users[userid];
+    }
+  }
+  return null;
+};
 
 // Route to return the URL database in JSON format
 app.get("/urls.json", (req, res) => {
@@ -99,11 +67,7 @@ app.get("/urls/new", (req, res) => {
 app.post("/urls", (req, res) => {
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
-
-  // Save the new short URL and corresponding long URL in the database
   urlDatabase[shortURL] = longURL;
-  saveDatabase();
-
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -168,7 +132,6 @@ app.post("/urls/:id", (req, res) => {
 
   // Update the long URL in the database
   urlDatabase[shortURL] = newLongURL;
-  saveDatabase();
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -180,7 +143,6 @@ app.post("/urls/:id/delete", (req, res) => {
     return res.status(404).send('Short URL not found!');
   }
   delete urlDatabase[shortURL];
-  saveDatabase();
   res.redirect("/urls");
 });
 
@@ -252,6 +214,3 @@ app.post("/register", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-// Load the database when the server starts up
-loadDatabase();
