@@ -149,6 +149,12 @@ app.post("/urls/:id/delete", (req, res) => {
 app.get("/login", (req, res) => {
   const userId = req.cookies['user_id'];
   const user = users[userId];
+
+  // If user is logged in, redirect to /urls
+  if (user) {
+    return res.redirect("/urls");
+  }
+
   const templateVars = {
     user: user
   };
@@ -180,6 +186,11 @@ app.post("/logout", (req, res) => {
 app.get("/register", (req, res) => {
   const userId = req.cookies['user_id'];
   const user = users[userId];
+
+  // If user is logged in, redirect to /urls
+  if (user) {
+    return res.redirect("/urls");
+  }
   const templateVars = {
     user: user
   };
