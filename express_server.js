@@ -60,7 +60,7 @@ app.get("/urls", (req, res) => {
 
   // If user is not logged in, return error message
   if (!user) {
-    return res.status(401).send("Please log in to view your urls")
+    return res.status(403).send("Please log in to view your urls")
   }
 
   const userUrls = urlsForUser(userId);
@@ -94,7 +94,7 @@ app.post("/urls", (req, res) => {
   const user = users[userId];
 
   if (!user) {
-    return res.status(401).send("Please log in to create a new short URL");
+    return res.status(403).send("Please log in to create a new short URL");
   }
 
   const longURL = req.body.longURL;
@@ -117,7 +117,7 @@ app.get("/urls/:id", (req, res) => {
 
   // If user is not logged in return error message
   if (!user) {
-    return res.status(401).send('Please log in to view the URL details.');
+    return res.status(403).send('Please log in to view the URL details.');
   }
 
   // If the URL does not exist return error message
@@ -163,7 +163,7 @@ app.get("/urls/:id/edit", (req, res) => {
   }
 
   if (!user) {
-    return res.status(401).send('Please log in to edit the URL.');
+    return res.status(403).send('Please log in to edit the URL.');
   }
 
   if (urlData.userID !== userId) {
@@ -190,7 +190,7 @@ app.post("/urls/:id", (req, res) => {
   }
 
   if (!userId) {
-    return res.status(401).send('Please log in to edit the URL');
+    return res.status(403).send('Please log in to edit the URL');
   }
 
   if (urlData.userID !== userId) {
@@ -217,7 +217,7 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 
   if (!userId) {
-    return res.status(401).send('Please log in to dleete the URL');
+    return res.status(403).send('Please log in to dleete the URL');
   }
 
   if (urlData.userID !== userId) {
