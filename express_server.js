@@ -74,7 +74,7 @@ app.post("/urls", (req, res) => {
   const user = users[userId];
 
   if (!user) {
-    return res.send("Please log in to create a new short URL");
+    return res.status(401).send("Please log in to create a new short URL");
   }
 
   const longURL = req.body.longURL;
