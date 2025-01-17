@@ -79,24 +79,29 @@ app.post("/urls", (req, res) => {
 
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = longURL;
+
+  urlDatabase[shortURL] = {
+    longURL: longURL,
+    userID: userId
+  }
+
   res.redirect(`/urls/${shortURL}`);
 });
 
 // Route to display the specific short URL and its corresponding long URL
 app.get("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
-  const longURL = urlDatabase[shortURL];
+  const urlData = urlDatabase[shortURL];
   const userId = req.cookies['user_id'];
   const user = users[userId];
 
-  if (!longURL) {
+  if (!urlData) {
     return res.status(404).send('Short URL not found!');
   }
 
   const templateVars = {
     id: shortURL,
-    longURL,
+    longURL: urlData.longURL,
     user: user,
   };
   res.render("urls_show", templateVars);
@@ -104,30 +109,47 @@ app.get("/urls/:id", (req, res) => {
 
 // Route to handle redirection to the long URL based on the short URL ID
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
+  const urlData = urlDatabase[req.params.id];
 
-  if (!longURL) {
-    return res.status(404).send('Short URL not found!'); // Return 4404 if short URL doesn't exist
+  if (!urlData) {
+    return res.status(404).send(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+        <title>URL Not Found</title>
+      </head>
+      <body>
+        <main style="margin: 1em;">
+          <h3>404 - URL Not Found</h3>
+          <p>The shortened URL you are trying to access does not exist.</p>
+          <a href="/urls" class="btn btn-primary">Back to URLs List</a>
+        </main>
+      </body>
+      </html>
+    `);
   }
-
-  // Redirect the user to the long URL (using a permanent redirect)
-  res.redirect(301, longURL); // Use 301 for permanent redirection
+  
+  // Redirect the user to the long URL - using a permanent redirect
+  res.redirect(301, urlData.longURL); // Use 301 for permanent redirection
 });
 
 // Route to render the form for updating a URL
 app.get("/urls/:id/edit", (req, res) => {
   const shortURL = req.params.id;
-  const longURL = urlDatabase[shortURL];
+  const urlData = urlDatabase[shortURL];
   const userId = req.cookies['user_id'];
   const user = users[userId];
 
-  if (!longURL) {
+  if (!urlData) {
     return res.status(404).send('Short URL not found!');
   }
 
   const templateVars = {
     id: shortURL,
-    longURL,
+    longURL: urlData.longURL,
     user: user,
   };
   res.render("urls_show", templateVars);
@@ -137,13 +159,18 @@ app.get("/urls/:id/edit", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   const newLongURL = req.body.longURL;
+  const userId = req.cookies['user_id'];
 
   if (!urlDatabase[shortURL]) {
     return res.status(404).send('Short URL not found!');
   }
 
   // Update the long URL in the database
-  urlDatabase[shortURL] = newLongURL;
+  urlDatabase[shortURL] = {
+    longURL: newLongURL,
+    userID: userId,
+  };
+
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -154,6 +181,7 @@ app.post("/urls/:id/delete", (req, res) => {
   if (!urlDatabase[shortURL]) {
     return res.status(404).send('Short URL not found!');
   }
+  
   delete urlDatabase[shortURL];
   res.redirect("/urls");
 });
