@@ -20,6 +20,8 @@
     <%- include('partials/_header') %>
     <main style="margin: 1em;">
       <h3>My URLs</h3>
+      <% if (Object.keys(urls).length === 0) { %>}
+        <p>You haven't created any URLs yet. <a href="/urls/new">Create one now</a>.</p>
       <table class="table">
         <thead>
           <tr>
