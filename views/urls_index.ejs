@@ -20,8 +20,6 @@
     <%- include('partials/_header') %>
     <main style="margin: 1em;">
       <h3>My URLs</h3>
-      <% if (Object.keys(urls).length === 0) %>}
-        <p>You haven't created any URLs yet. <a href="/urls/new">Create one now</a>.</p>
       <table class="table">
         <thead>
           <tr>
@@ -32,21 +30,29 @@
           </tr>
         </thead>
         <tbody>
-          <% for (let id in urls) { %>
+          <% if (Object.keys(urls).length === 0) { %>
             <tr>
-              <td><%= id %></td>
-              <td><%= urls[id].longURL %></td>
-              <td>
-                <form action="/urls/<%= id %>" method="GET" style="display: inline;">
-                  <button type="submit" class="btn btn-outline-primary">Edit</button>
-                </form>
-              </td>
-              <td>
-                <form action="/urls/<%= id %>/delete" method="POST" style="display: inline;">
-                  <button type="submit" class="btn btn-outline-danger">Delete</button>
-                </form>
+              <td colspan="4" class="text-center">
+                You haven't created any URLs yet. <a href="/urls/new">Create one now</a>.
               </td>
             </tr>
+          <% } else { %>
+            <% for (let id in urls) { %>
+              <tr>
+                <td><%= id %></td>
+                <td><%= urls[id].longURL %></td>
+                <td>
+                  <form action="/urls/<%= id %>" method="GET" style="display: inline;">
+                    <button type="submit" class="btn btn-outline-primary">Edit</button>
+                  </form>
+                </td>
+                <td>
+                  <form action="/urls/<%= id %>/delete" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-outline-danger">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            <% } %>
           <% } %>
         </tbody>
       </table>
