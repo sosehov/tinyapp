@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const bcrypt = require("bcryptjs");
 const app = express();
 const PORT = 8080;
 
@@ -252,9 +253,12 @@ app.post("/login", (req, res) => {
   if (!existingUser) {
     return res.status(403).send('Invalid user');
   }
-  if (password !== existingUser.password) {
+
+  // Compare plain password with stored hash
+  if (!bcrypt.compareSync(password, existingUser.password)) {
     return res.status(403).send('incorrect password');
   }
+
   res.cookie('user_id', existingUser.id);
   res.redirect("/urls");
 });
@@ -283,6 +287,7 @@ app.get("/register", (req, res) => {
 // Route to handle registration form submission
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
+  const hashedPassword = bcrypt.hashSync(password, 10);
 
   if (!email || !password) {
     return res.status(400).send('Email and password are required');
@@ -297,7 +302,7 @@ app.post("/register", (req, res) => {
   users[userid] = {
     id: userid,
     email: email,
-    password: password,
+    password: hashedPassword,
   };
   res.cookie('user_id', userid);
   res.redirect("/urls");
