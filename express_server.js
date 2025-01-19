@@ -2,6 +2,7 @@ const express = require("express");
 const morgan = require('morgan');
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
+const getUserByEmail = require('/helpers');
 const app = express();
 const PORT = 8080;
 
@@ -29,16 +30,6 @@ const generateRandomString = function() {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
-};
-
-// Helper function to lookup user in users object
-const getUserByEmail = function(email, database) {
-  for (const userid in database) {
-    if (database[userid].email === email) {
-      return database[userid];
-    }
-  }
-  return null;
 };
 
 // Helper function to finding URLs associated with a specific userid
