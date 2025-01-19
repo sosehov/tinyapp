@@ -32,10 +32,10 @@ const generateRandomString = function() {
 };
 
 // Helper function to lookup user in users object
-const findUserByEmail = function(email) {
-  for (const userid in users) {
-    if (users[userid].email === email) {
-      return users[userid];
+const getUserByEmail = function(email, database) {
+  for (const userid in database) {
+    if (database[userid].email === email) {
+      return database[userid];
     }
   }
   return null;
@@ -252,7 +252,7 @@ app.get("/login", (req, res) => {
 // Route to handle login
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  const existingUser = findUserByEmail(email);
+  const existingUser = getUserByEmail(email, users);
 
   if (!existingUser) {
     return res.status(403).send('Invalid user');
@@ -297,7 +297,7 @@ app.post("/register", (req, res) => {
     return res.status(400).send('Email and password are required');
   }
 
-  const existingUser = findUserByEmail(email);
+  const existingUser = getUserByEmail(email, users);
   if (existingUser) {
     return res.status(400).send('Email is already registered!');
   }
