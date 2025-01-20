@@ -24,22 +24,22 @@ describe('getUserByEmail', function() {
 
   it('should return null when email is not found', function() {
     const user = getUserByEmail("nonexistent@example.com", testUsers)
-    assert.isNull(user);
+    assert.isNull(user, 'User should be null when email is not found in database');
   });
 
   it('should handle empty email parameter', function() {
     const user = getUserByEmail("", testUsers);
-    assert.isNull(user);
+    assert.isNull(user, 'User should be null when no email is passed as a parameter');
   });
 
   it('should handle empty database', function() {
     const user = getUserByEmail("user@example.com", {});
-    assert.isNull(user);
+    assert.isNull(user, 'User should be null when database is empty');
   });
 
   it('should handle null database', function() {
     const user = getUserByEmail("user@example.com", null);
-    assert.isNull(user);
+    assert.isNull(user, 'User should be null when database is null');
   });
 
 });
