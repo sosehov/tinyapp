@@ -2,7 +2,7 @@ const express = require("express");
 const morgan = require('morgan');
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
-const getUserByEmail = require('./helpers');
+const { getUserByEmail,urlsForUser } = require('./helpers');
 const app = express();
 const PORT = 8080;
 
