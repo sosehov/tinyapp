@@ -32,18 +32,6 @@ const generateRandomString = function() {
   return result;
 };
 
-// Helper function to finding URLs associated with a specific userid
-const urlsForUser = function(id) {
-  const userUrls = {};
-
-  for (const shortURL in urlDatabase) {
-    if ( urlDatabase[shortURL].userID === id) {
-      userUrls[shortURL] = urlDatabase[shortURL];
-    }
-  }
-  return userUrls;
-}
-
 // Route to return the URL database in JSON format
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
