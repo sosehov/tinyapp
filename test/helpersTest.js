@@ -22,24 +22,24 @@ describe('getUserByEmail', function() {
     assert.equal(user.id, expectedUserID);
   });
 
-  it('should return undefined when email is not found', function() {
+  it('should return null when email is not found', function() {
     const user = getUserByEmail("nonexistent@example.com", testUsers)
-    assert.isUndefined(user);
+    assert.isNull(user);
   });
 
   it('should handle empty email parameter', function() {
     const user = getUserByEmail("", testUsers);
-    assert.isUndefined(user);
+    assert.isNull(user);
   });
 
   it('should handle empty database', function() {
     const user = getUserByEmail("user@example.com", {});
-    assert.isUndefined(user);
+    assert.isNull(user);
   });
 
   it('should handle null database', function() {
     const user = getUserByEmail("user@example.com", null);
-    assert.isUndefined(user);
+    assert.isNull(user);
   });
 
 });
