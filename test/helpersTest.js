@@ -15,7 +15,7 @@ const testUsers = {
   }
 };
 
-describe('getUserByEmail', function() {
+describe('Testing helper function: getUserByEmail', function() {
   it('should return a user with valid email', function() {
     const user = getUserByEmail("user@example.com", testUsers)
     const expectedUserID = "userRandomID";
