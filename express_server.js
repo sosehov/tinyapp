@@ -47,7 +47,7 @@ app.get("/urls", (req, res) => {
     return res.status(403).send("Please log in to view your urls")
   }
 
-  const userUrls = urlsForUser(userId);
+  const userUrls = urlsForUser(userId, urlDatabase);
 
   const templateVars = {
     urls: userUrls,
