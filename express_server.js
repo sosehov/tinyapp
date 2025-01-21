@@ -11,7 +11,7 @@ app.use(express.urlencoded({extended: true }));
 app.set("view engine", "ejs");
 app.use(cookieSession({
   name: 'session',
-  keys: [process.env.SESSION_KEY ||'development-secret-key'],
+  keys: [process.env.SESSION_KEY || 'development-secret-key'],
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
 
@@ -34,14 +34,14 @@ const generateRandomString = function() {
 
 // Home route
 app.get("/", (req, res) => {
-  const userId = req.session.user_id;
+  const userId = req.session.userId;
   const user = users[userId];
 
-  if(!user) {
+  if (!user) {
     res.redirect("/login");
   }
   res.redirect("/urls");
-})
+});
 
 // Route to return the URL database in JSON format
 app.get("/urls.json", (req, res) => {
@@ -50,12 +50,12 @@ app.get("/urls.json", (req, res) => {
 
 // Route to render a page displaying all URLs
 app.get("/urls", (req, res) => {
-  const userId = req.session.user_id;
+  const userId = req.session.userId;
   const user = users[userId];
 
   // If user is not logged in, return error message
   if (!user) {
-    return res.status(403).send("Please log in to view your urls")
+    return res.status(403).send("Please log in to view your urls");
   }
 
   const userUrls = urlsForUser(userId, urlDatabase);
@@ -69,7 +69,7 @@ app.get("/urls", (req, res) => {
 
 // Route to render the form for creating a new URL
 app.get("/urls/new", (req, res) => {
-  const userId = req.session.user_id;
+  const userId = req.session.userId;
   const user = users[userId];
 
   // If user is not logged in redirect to login page
@@ -85,7 +85,7 @@ app.get("/urls/new", (req, res) => {
 
 // Route to handle form submission and create a new short URL
 app.post("/urls", (req, res) => {
-  const userId = req.session.user_id;
+  const userId = req.session.userId;
   const user = users[userId];
 
   if (!user) {
@@ -98,7 +98,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = {
     longURL: longURL,
     userID: userId
-  }
+  };
 
   res.redirect(`/urls/${shortURL}`);
 });
@@ -107,7 +107,7 @@ app.post("/urls", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   const urlData = urlDatabase[shortURL];
-  const userId = req.session.user_id;
+  const userId = req.session.userId;
   const user = users[userId];
 
   // If user is not logged in return error message
@@ -150,7 +150,7 @@ app.get("/u/:id", (req, res) => {
 app.get("/urls/:id/edit", (req, res) => {
   const shortURL = req.params.id;
   const urlData = urlDatabase[shortURL];
-  const userId = req.session.user_id;
+  const userId = req.session.userId;
   const user = users[userId];
 
   if (!urlData) {
@@ -177,7 +177,7 @@ app.get("/urls/:id/edit", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   const newLongURL = req.body.longURL;
-  const userId = req.session.user_id;
+  const userId = req.session.userId;
   const urlData = urlDatabase[shortURL];
 
   if (!urlData) {
@@ -204,7 +204,7 @@ app.post("/urls/:id", (req, res) => {
 // Route to handle deleting a URL resource
 app.post("/urls/:id/delete", (req, res) => {
   const shortURL = req.params.id;
-  const userId = req.session.user_id;
+  const userId = req.session.userId;
   const urlData = urlDatabase[shortURL];
 
   if (!urlData) {
@@ -212,7 +212,7 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 
   if (!userId) {
-    return res.status(403).send('Please log in to dleete the URL');
+    return res.status(403).send('Please log in to delete the URL');
   }
 
   if (urlData.userID !== userId) {
@@ -225,7 +225,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // Route to GET the login form
 app.get("/login", (req, res) => {
-  const userId = req.session.user_id;
+  const userId = req.session.userId;
   const user = users[userId];
 
   // If user is logged in, redirect to /urls
@@ -253,7 +253,7 @@ app.post("/login", (req, res) => {
     return res.status(403).send('incorrect password');
   }
 
-  req.session.user_id = existingUser.id;
+  req.session.userId = existingUser.id;
   res.redirect("/urls");
 });
 
@@ -265,7 +265,7 @@ app.post("/logout", (req, res) => {
 
 // Route to render the registration form
 app.get("/register", (req, res) => {
-  const userId = req.session.user_id;
+  const userId = req.session.userId;
   const user = users[userId];
 
   // If user is logged in, redirect to /urls
@@ -298,7 +298,7 @@ app.post("/register", (req, res) => {
     email: email,
     password: hashedPassword,
   };
-  req.session.user_id = userid;
+  req.session.userId = userid;
   res.redirect("/urls");
 });
 
