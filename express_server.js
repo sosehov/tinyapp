@@ -2,7 +2,7 @@ const express = require("express");
 const morgan = require('morgan');
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
-const { getUserByEmail,urlsForUser } = require('./helpers');
+const { getUserByEmail,urlsForUser, generateRandomString } = require('./helpers');
 const app = express();
 const PORT = 8080;
 
@@ -20,17 +20,6 @@ let urlDatabase = {};
 
 // Initialize the users database
 const users = {};
-
-// Generate a random 6-character string for a short URL ID
-const generateRandomString = function() {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
-  for (let i = 0; i < 6; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-};
 
 // Home route
 app.get("/", (req, res) => {
