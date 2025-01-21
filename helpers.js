@@ -26,4 +26,15 @@ const urlsForUser = function(userId, urlDatabase) {
   return userUrls;
 };
 
-module.exports = { getUserByEmail, urlsForUser };
+// Generate a random 6-character string for a short URL ID
+const generateRandomString = function() {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  for (let i = 0; i < 6; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
+module.exports = { getUserByEmail, urlsForUser, generateRandomString };
