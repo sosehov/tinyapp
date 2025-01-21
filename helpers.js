@@ -19,11 +19,11 @@ const urlsForUser = function(userId, urlDatabase) {
   // Loop through the urlDatabase and add matching URLS to the result object
   for (const shortURL in urlDatabase) {
     const urlData = urlDatabase[shortURL];
-    if ( urlData.userID === userId) {
+    if (urlData.userID === userId) {
       userUrls[shortURL] = urlData;
     }
   }
   return userUrls;
-}
+};
 
 module.exports = { getUserByEmail, urlsForUser };
