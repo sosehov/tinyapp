@@ -32,6 +32,17 @@ const generateRandomString = function() {
   return result;
 };
 
+// Home route
+app.get("/", (req, res) => {
+  const userId = req.session.user_id;
+  const user = users[userId];
+
+  if(!user) {
+    res.redirect("/login");
+  }
+  res.redirect("/urls");
+})
+
 // Route to return the URL database in JSON format
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
