@@ -21,6 +21,9 @@ let urlDatabase = {};
 // Initialize the users database
 const users = {};
 
+// Track deleted URLs using a simple object
+const deletedUrls = {};
+
 // Home route
 app.get("/", (req, res) => {
   const userId = req.session.userId;
@@ -125,7 +128,14 @@ app.get("/urls/:id", (req, res) => {
 
 // Route to handle redirection to the long URL based on the short URL ID
 app.get("/u/:id", (req, res) => {
-  const urlData = urlDatabase[req.params.id];
+  const shortURL = req.params.id;
+
+  // Check if the URL has been deleted
+  if (deletedUrls[shortURL]) {
+    return res.status(410).send("410 - Gone: This shortened URL has been deleted and is no longer available.");
+  }
+
+  const urlData = urlDatabase[shortURL];
 
   if (!urlData) {
     return res.status(404).send("404 - URL Not Found: The shortened URL you are trying to access does not exist.");
@@ -208,6 +218,7 @@ app.post("/urls/:id/delete", (req, res) => {
     return res.status(403).send('You do not have permission to delete this URL');
   }
 
+  deletedUrls[shortURL] = true;
   delete urlDatabase[shortURL];
   res.redirect("/urls");
 });
